@@ -1,6 +1,0 @@
-C:\Users\colan\Documents\Visual Studio 2017\Projects\dotnet_core_simple_jwt\dotnet_core_simple_jwt\bin\Release\netstandard1.4\dotnet_core_simple_jwt.deps.json
-C:\Users\colan\Documents\Visual Studio 2017\Projects\dotnet_core_simple_jwt\dotnet_core_simple_jwt\bin\Release\netstandard1.4\dotnet_core_simple_jwt.dll
-C:\Users\colan\Documents\Visual Studio 2017\Projects\dotnet_core_simple_jwt\dotnet_core_simple_jwt\bin\Release\netstandard1.4\dotnet_core_simple_jwt.pdb
-C:\Users\colan\Documents\Visual Studio 2017\Projects\dotnet_core_simple_jwt\dotnet_core_simple_jwt\obj\Release\netstandard1.4\dotnet_core_simple_jwt.AssemblyInfo.cs
-C:\Users\colan\Documents\Visual Studio 2017\Projects\dotnet_core_simple_jwt\dotnet_core_simple_jwt\obj\Release\netstandard1.4\dotnet_core_simple_jwt.dll
-C:\Users\colan\Documents\Visual Studio 2017\Projects\dotnet_core_simple_jwt\dotnet_core_simple_jwt\obj\Release\netstandard1.4\dotnet_core_simple_jwt.pdb
