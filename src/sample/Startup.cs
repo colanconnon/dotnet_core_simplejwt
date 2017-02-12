@@ -34,8 +34,7 @@ namespace Sample
             var sqlConnectionString = Configuration["Data:DbContext:ConnectionString"];
             services.AddDbContext<SampleDbContext>(options =>
                options.UseNpgsql(
-                   sqlConnectionString,
-                   b => b.MigrationsAssembly("sample")
+                   sqlConnectionString
                )
             );
             services.AddIdentity<ApplicationUser, IdentityRole>()

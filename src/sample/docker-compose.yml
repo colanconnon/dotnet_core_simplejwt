@@ -18,8 +18,8 @@ services:
 #     networks:
 #       - aspnetcoreapp-network
 
-  postgres:
-    container_name: 'postgres'
+  pg:
+    container_name: 'pg'
     image: postgres
     ports:
       - "54323:5432"

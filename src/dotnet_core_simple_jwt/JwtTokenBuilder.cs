@@ -18,6 +18,8 @@ namespace dotnet_core_simple_jwt
 
         private string _username;
 
+        private string _user_id;
+
         private DateTime? _expiration;
         private string _secret;
 
@@ -37,6 +39,12 @@ namespace dotnet_core_simple_jwt
             return this;
         }
 
+        public JwtTokenBuilder AddUserId(string userId)
+        {
+            this._user_id = userId;
+            return this;
+        }
+
         public JwtTokenBuilder AddSecret(string secret)
         {
             this._secret = secret;
@@ -53,7 +61,8 @@ namespace dotnet_core_simple_jwt
             var jwtData = new JwtData()
             {
                 Username = _username,
-                Iat = _expiration
+                Iat = _expiration,
+                UserId = _user_id
             };
             var jwtToken = new JwtToken()
             {
