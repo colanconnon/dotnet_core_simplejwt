@@ -106,6 +106,7 @@ namespace dotnet_core_simple_jwt
                     var jwtToken = new JwtTokenBuilder().AddSecret(options.secret)
                                                         .AddUsername(user.UserName)
                                                         .AddUserId(user.Id)
+                                                        .AddExpiration(DateTime.UtcNow.AddDays(7))
                                                         .Build();
                     var jsonString = "{\"token\":\""  + jwtToken +"\"}";
                     context.Response.ContentType = new MediaTypeHeaderValue("application/json").ToString();
