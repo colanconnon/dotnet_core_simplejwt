@@ -100,14 +100,24 @@ namespace dotnet_core_simple_jwt
             }
             else 
             {
-                context.Response.StatusCode = 200;
-                var jwtToken = new JwtTokenBuilder().AddSecret(options.secret)
-                                                    .AddUsername(user.UserName)
-                                                    .AddUserId(user.Id)
-                                                    .Build();
-                var jsonString = "{\"token\":\""  + jwtToken +"\"}";
-                context.Response.ContentType = new MediaTypeHeaderValue("application/json").ToString();
-                await context.Response.WriteAsync(jsonString, Encoding.UTF8);
+                if (await this._userManager.CheckPasswordAsync(user, json.password)) 
+                {
+                    context.Response.StatusCode = 200;
+                    var jwtToken = new JwtTokenBuilder().AddSecret(options.secret)
+                                                        .AddUsername(user.UserName)
+                                                        .AddUserId(user.Id)
+                                                        .Build();
+                    var jsonString = "{\"token\":\""  + jwtToken +"\"}";
+                    context.Response.ContentType = new MediaTypeHeaderValue("application/json").ToString();
+                    await context.Response.WriteAsync(jsonString, Encoding.UTF8);
+                }
+                else 
+                {
+                    context.Response.StatusCode = 401;
+                    var jsonString = "{\"error\":\"unauthorized, must pass a correct username and password\"}";
+                    context.Response.ContentType = new MediaTypeHeaderValue("application/json").ToString();
+                    await context.Response.WriteAsync(jsonString, Encoding.UTF8);
+                }
                 return;
             }
         }
