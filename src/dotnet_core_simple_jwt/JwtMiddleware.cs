@@ -63,7 +63,43 @@ namespace dotnet_core_simple_jwt
             {
                 await HandleRegisterRequest(context);
             }
+            if (path.Value == options.tokenEndpoint  && context.Request.Method == "GET")
+            {
+                await HandleTokenValidationRequest(context);
+                return;
+            }
             return;
+        }
+
+        public async Task HandleTokenValidationRequest(HttpContext context)
+        {
+            var jwtTokenVerification = new JwtTokenVerificaion<T>(options.secret);
+            var token = context.Request.Headers.First(x => x.Key == "Authorization").Value.ToString().Split(' ');
+            System.Console.WriteLine(token[0]);
+            if (token.Length == 2 && token[1] != null) 
+            {
+                var user = jwtTokenVerification.verify(token[1]);
+                if ( user != null) 
+                {
+                    var jsonString = JsonConvert.SerializeObject(new { Username = user.UserName , Id = user.Id });
+                    context.Response.ContentType = new MediaTypeHeaderValue("application/json").ToString();
+                    await context.Response.WriteAsync(jsonString, Encoding.UTF8);
+                }
+                else 
+                {
+                    var jsonString  = JsonConvert.SerializeObject(new { Error = "Invalid JWT Token"});
+                    context.Response.ContentType = new MediaTypeHeaderValue("application/json").ToString();
+                    context.Response.StatusCode = 401;
+                    await context.Response.WriteAsync(jsonString, Encoding.UTF8);
+                }
+            }
+            else 
+            {
+                var jsonString = JsonConvert.SerializeObject(new {Error =  "Invalid Authorization header"});
+                context.Response.ContentType = new MediaTypeHeaderValue("application/json").ToString();
+                context.Response.StatusCode = 401;
+                await context.Response.WriteAsync(jsonString, Encoding.UTF8);
+            }
         }
 
         public async Task HandleRegisterRequest(HttpContext context) 
@@ -81,8 +117,8 @@ namespace dotnet_core_simple_jwt
             }
             else 
             {
-                System.Console.WriteLine(result.Errors.Select(x => x.Description).ToString());
                 var jsonString = "{\"errors\":\"error creating user\"}";
+                context.Response.StatusCode = 400;
                 context.Response.ContentType = new MediaTypeHeaderValue("application/json").ToString();
                 await context.Response.WriteAsync(jsonString, Encoding.UTF8);    
             }
