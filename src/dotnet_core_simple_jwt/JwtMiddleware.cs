@@ -24,6 +24,8 @@ namespace dotnet_core_simple_jwt
     {
         public string secret { get; set; }
 
+        public string tokenEndpoint { get; set; } = "/token";
+
     }
     public class JwtMiddleware<T> where T : IdentityUser, new()
     {
@@ -51,7 +53,8 @@ namespace dotnet_core_simple_jwt
         public async Task HandleRequest(HttpContext context)
         {
             var path = context.Request.Path;
-            if (path.Value == "/token" && context.Request.Method == "POST")
+            System.Console.WriteLine(options.tokenEndpoint);
+            if (path.Value == options.tokenEndpoint && context.Request.Method == "POST")
             {
                 await HandleTokenRequest(context);
                 return;

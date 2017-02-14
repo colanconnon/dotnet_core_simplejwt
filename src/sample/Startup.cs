@@ -44,6 +44,7 @@ namespace Sample
             services.Configure<JwtMiddlewareOptions>(options =>
             {
                 options.secret = "blahblahblah";
+                options.tokenEndpoint = "/login";
             });
         }
 
