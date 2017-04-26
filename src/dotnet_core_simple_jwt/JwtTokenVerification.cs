@@ -11,46 +11,52 @@ using Newtonsoft.Json;
 
 namespace dotnet_core_simple_jwt
 {
-    public class JwtTokenVerificaion<T> where T : IdentityUser, new()
+    public class JwtTokenVerificaion : IJwtVerificationStrategy
     {
         private IJwtSignatureStrategy IJwtSignatureStrategy;
-        public JwtTokenVerificaion(string secret, string algorithm = "HS256") 
+
+        private readonly JwtMiddlewareOptions options;
+        public JwtTokenVerificaion(
+            string secret, 
+            JwtMiddlewareOptions jwtOptions, 
+            string algorithm = "HS256"
+        ) 
         {
-        
+            this.options = jwtOptions;
             this.IJwtSignatureStrategy = JwtSignatureFactory.Create(algorithm, secret);
         }
 
-        public async Task HandleTokenVerificationRequest(HttpContext context)
+
+        public IdentityUser HandleTokenVerificationRequest(HttpContext context)
         {
-            var token = context.Request.Headers.First(x => x.Key == "Authorization").Value.ToString().Split(' ');
-            System.Console.WriteLine(token[0]);
+            if(!context.Request.Headers.ContainsKey("Authorization")) 
+            {
+                throw new InvalidJwtException("No Authorization header provided, this endpoint requires bearer auth");
+            }
+            var token = context.Request.Headers["Authorization"].ToString().Split(' ');
+            if (token[0] != this.options.AuthPrefix) 
+            {
+                throw new InvalidJwtException("Invalid JWT Token");
+            }
             if (token.Length == 2 && token[1] != null) 
             {
                 var user = verify(token[1]);
                 if ( user != null) 
                 {
-                    var jsonString = JsonConvert.SerializeObject(new { Username = user.UserName , Id = user.Id });
-                    context.Response.ContentType = new MediaTypeHeaderValue("application/json").ToString();
-                    await context.Response.WriteAsync(jsonString, Encoding.UTF8);
+                    return user;
                 }
                 else 
                 {
-                    var jsonString  = JsonConvert.SerializeObject(new { Error = "Invalid JWT Token"});
-                    context.Response.ContentType = new MediaTypeHeaderValue("application/json").ToString();
-                    context.Response.StatusCode = 401;
-                    await context.Response.WriteAsync(jsonString, Encoding.UTF8);
+                    return null;
                 }
             }
             else 
             {
-                var jsonString = JsonConvert.SerializeObject(new {Error =  "Invalid Authorization header"});
-                context.Response.ContentType = new MediaTypeHeaderValue("application/json").ToString();
-                context.Response.StatusCode = 401;
-                await context.Response.WriteAsync(jsonString, Encoding.UTF8);
+                return null;
             }
         }
 
-        public T verify(string jwtToken) 
+        public IdentityUser verify(string jwtToken) 
         {
             try
             {
@@ -63,7 +69,7 @@ namespace dotnet_core_simple_jwt
                 {
                     throw new Exception("JWT Token is expired");
                 }
-                return new T() {
+                return new IdentityUser() {
                     UserName = jwt.jwtData.Username,
                     Id = jwt.jwtData.UserId,
                     Email = jwt.jwtData.Username

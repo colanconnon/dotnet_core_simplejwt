@@ -1,0 +1,13 @@
+/Users/colanconnon/Developer/dotnet_core_simplejwt/tests/bin/Debug/netcoreapp1.1/tests.deps.json
+/Users/colanconnon/Developer/dotnet_core_simplejwt/tests/bin/Debug/netcoreapp1.1/tests.runtimeconfig.json
+/Users/colanconnon/Developer/dotnet_core_simplejwt/tests/bin/Debug/netcoreapp1.1/tests.runtimeconfig.dev.json
+/Users/colanconnon/Developer/dotnet_core_simplejwt/tests/obj/Debug/netcoreapp1.1/tests.AssemblyInfo.cs
+/Users/colanconnon/Developer/dotnet_core_simplejwt/tests/bin/Debug/netcoreapp1.1/xunit.runner.visualstudio.dotnetcore.testadapter.dll
+/Users/colanconnon/Developer/dotnet_core_simplejwt/tests/bin/Debug/netcoreapp1.1/xunit.runner.utility.netstandard15.dll
+/Users/colanconnon/Developer/dotnet_core_simplejwt/tests/bin/Debug/netcoreapp1.1/xunit.runner.reporters.netstandard15.dll
+/Users/colanconnon/Developer/dotnet_core_simplejwt/tests/bin/Debug/netcoreapp1.1/tests.dll
+/Users/colanconnon/Developer/dotnet_core_simplejwt/tests/bin/Debug/netcoreapp1.1/tests.pdb
+/Users/colanconnon/Developer/dotnet_core_simplejwt/tests/bin/Debug/netcoreapp1.1/dotnet_core_simple_jwt.dll
+/Users/colanconnon/Developer/dotnet_core_simplejwt/tests/bin/Debug/netcoreapp1.1/dotnet_core_simple_jwt.pdb
+/Users/colanconnon/Developer/dotnet_core_simplejwt/tests/obj/Debug/netcoreapp1.1/tests.dll
+/Users/colanconnon/Developer/dotnet_core_simplejwt/tests/obj/Debug/netcoreapp1.1/tests.pdb

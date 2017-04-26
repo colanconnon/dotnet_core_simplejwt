@@ -18,11 +18,14 @@ namespace dotnet_core_simple_jwt
         public JwtToken Decode(string jwtToken)
         {
             string[] jwt = jwtToken.Split('.');
-            //TODO: Make sure this actually was jwt data, and had all
-            // the correct parts
+            if (String.IsNullOrEmpty(jwt[0]) || String.IsNullOrEmpty(jwt[1]) || String.IsNullOrEmpty(jwt[2]))
+            {
+                throw new InvalidJwtException("Malformed jwt token");
+            }
             using (var hmac = new HMACSHA256(GetKeyAsBytes()))
             {
                 var jwtDataToSign = $"{jwt[0]}.{jwt[1]}";
+
                 var hash = hmac.ComputeHash(
                     jwtDataToSign.ToBytes()
                 );
@@ -35,9 +38,8 @@ namespace dotnet_core_simple_jwt
                         jwtHeader = JwtHeader.Create(jwt[0].Base64Decode())
                     };
                 }
-                return null;
+                throw new InvalidJwtException("JWT signature does not match");
             }
-
         }
 
         public string Encode(JwtToken jwtToken)

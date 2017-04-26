@@ -31,6 +31,7 @@ namespace Sample
         {
             // Add framework services.
             services.AddMvc();
+            
             var sqlConnectionString = Configuration["Data:DbContext:ConnectionString"];
             services.AddDbContext<SampleDbContext>(options =>
                options.UseNpgsql(
@@ -46,6 +47,8 @@ namespace Sample
                 options.secret = "blahblahblah";
                 options.tokenEndpoint = "/login";
             });
+            services.AddScoped<AuthorizationAttribute>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -77,9 +80,9 @@ namespace Sample
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
 
-                routes.MapSpaFallbackRoute(
-                    name: "spa-fallback",
-                    defaults: new { controller = "Home", action = "Index" });
+                // routes.MapSpaFallbackRoute(
+                //     name: "spa-fallback",
+                //     defaults: new { controller = "Home", action = "Index" });
             });
         }
     }

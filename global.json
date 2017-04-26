@@ -1,5 +1,5 @@
 {
-  "projects": [ "src/dotnet_core_simple_jwt", "src/sample" ],
+  "projects": [ "src/dotnet_core_simple_jwt", "src/sample", "tests" ],
   "sdk": {
     "version": "1.1.0"
   }

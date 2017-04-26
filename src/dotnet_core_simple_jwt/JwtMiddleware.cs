@@ -14,17 +14,26 @@ using System.Linq;
 
 namespace dotnet_core_simple_jwt
 {
-    public class AuthCreds 
+    public class AuthCreds
     {
-        public string username {get; set;}
+        public string username { get; set; }
 
-        public string password {get; set;}
+        public string password { get; set; }
     }
     public class JwtMiddlewareOptions
     {
         public string secret { get; set; }
 
+        
+        public string AuthPrefix { get; set; } = "Bearer:";
+
         public string tokenEndpoint { get; set; } = "/token";
+
+        public string registerEndpoint {get; set; } = "/register";
+
+        public bool allowRegistration {get; set;} = true;
+
+        public bool allowTokenIssuing { get; set; } = true;
 
     }
     public class JwtMiddleware<T> where T : IdentityUser, new()
@@ -53,64 +62,66 @@ namespace dotnet_core_simple_jwt
         public async Task HandleRequest(HttpContext context)
         {
             var path = context.Request.Path;
-            System.Console.WriteLine(options.tokenEndpoint);
+            context.Request.HttpContext.Items.Add("secret", options.secret);
             if (path.Value == options.tokenEndpoint && context.Request.Method == "POST")
             {
                 await HandleTokenRequest(context);
                 return;
             }
-            if (path.Value == "/register" && context.Request.Method == "POST")
+            if (options.allowRegistration && path.Value == options.registerEndpoint && context.Request.Method == "POST")
             {
                 await HandleRegisterRequest(context);
             }
-            if (path.Value == options.tokenEndpoint  && context.Request.Method == "GET")
+            if (path.Value == options.tokenEndpoint && context.Request.Method == "GET")
             {
-                var jwtTokenVerification = new JwtTokenVerificaion<T>(options.secret);
-                await jwtTokenVerification.HandleTokenVerificationRequest(context);
+                var jwtTokenVerification = new JwtTokenVerificaion(options.secret, options);
+                var user = jwtTokenVerification.HandleTokenVerificationRequest(context);
                 return;
             }
             return;
         }
 
 
-        public async Task HandleRegisterRequest(HttpContext context) 
+        public async Task HandleRegisterRequest(HttpContext context)
         {
-            var json =  JsonConvert.DeserializeObject<AuthCreds>(await ReadAsString(context.Request));
+            var json = JsonConvert.DeserializeObject<AuthCreds>(await ReadAsString(context.Request));
             var user = new T();
             user.UserName = json.username;
             user.Email = json.username;
             var result = await this._userManager.CreateAsync(user, json.password);
-            if (result.Succeeded) 
+            if (result.Succeeded)
             {
                 var jsonString = "{\"success\":\"user created with the provided creds\"}";
                 context.Response.ContentType = new MediaTypeHeaderValue("application/json").ToString();
-                await context.Response.WriteAsync(jsonString, Encoding.UTF8);    
+                await context.Response.WriteAsync(jsonString, Encoding.UTF8);
             }
-            else 
+            else
             {
                 var jsonString = "{\"errors\":\"error creating user\"}";
                 context.Response.StatusCode = 400;
                 context.Response.ContentType = new MediaTypeHeaderValue("application/json").ToString();
-                await context.Response.WriteAsync(jsonString, Encoding.UTF8);    
+                await context.Response.WriteAsync(jsonString, Encoding.UTF8);
             }
             return;
         }
 
         public async Task HandleTokenRequest(HttpContext context)
         {
-            var json =  JsonConvert.DeserializeObject<AuthCreds>(await ReadAsString(context.Request));
+            var json = JsonConvert.DeserializeObject<AuthCreds>(await ReadAsString(context.Request));
             var user = await this._userManager.FindByEmailAsync(json.username);
             if (user == null)
             {
                 context.Response.StatusCode = 401;
-                var jsonString = "{\"error\":\"unauthorized, must pass a correct username and password\"}";
+                var jsonString = JsonConvert.SerializeObject(new {
+                    error = "unauthorized, must pass a correct username and password"
+                }).ToString();
                 context.Response.ContentType = new MediaTypeHeaderValue("application/json").ToString();
                 await context.Response.WriteAsync(jsonString, Encoding.UTF8);
                 return;
             }
-            else 
+            else
             {
-                if (await this._userManager.CheckPasswordAsync(user, json.password)) 
+                if (await this._userManager.CheckPasswordAsync(user, json.password))
                 {
                     context.Response.StatusCode = 200;
                     var jwtToken = new JwtTokenBuilder().AddSecret(options.secret)
@@ -118,11 +129,11 @@ namespace dotnet_core_simple_jwt
                                                         .AddUserId(user.Id)
                                                         .AddExpiration(DateTime.UtcNow.AddDays(7))
                                                         .Build();
-                    var jsonString = "{\"token\":\""  + jwtToken +"\"}";
+                    var jsonString = "{\"token\":\"" + jwtToken + "\"}";
                     context.Response.ContentType = new MediaTypeHeaderValue("application/json").ToString();
                     await context.Response.WriteAsync(jsonString, Encoding.UTF8);
                 }
-                else 
+                else
                 {
                     context.Response.StatusCode = 401;
                     var jsonString = "{\"error\":\"unauthorized, must pass a correct username and password\"}";
@@ -137,7 +148,7 @@ namespace dotnet_core_simple_jwt
         public async Task<string> ReadAsString(HttpRequest request)
         {
             var initialBody = request.Body; // Workaround
- 
+
             var buffer = new byte[Convert.ToInt32(request.ContentLength)];
             await request.Body.ReadAsync(buffer, 0, buffer.Length);
             var body = Encoding.UTF8.GetString(buffer);
