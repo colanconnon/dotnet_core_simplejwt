@@ -62,6 +62,7 @@ namespace dotnet_core_simple_jwt
             {
                 Username = _username,
                 Iat = _expiration,
+                Exp = _expiration,
                 UserId = _user_id
             };
             var jwtToken = new JwtToken()

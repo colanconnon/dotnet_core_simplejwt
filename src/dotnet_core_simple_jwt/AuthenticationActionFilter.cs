@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Linq;
 using Microsoft.Extensions.Options;
+using System.Security.Principal;
 
 namespace dotnet_core_simple_jwt
 {
@@ -41,12 +42,18 @@ namespace dotnet_core_simple_jwt
         private Boolean ParseAuthenticationHeader(ActionExecutingContext context) 
         {
                 var httpContext = context.HttpContext;
-                var user = new JwtTokenVerificaion(
+                var JwtTokenVerificaion = new JwtTokenVerificaion(
                     this.options.secret,
                     this.options
                 );
+                var user = JwtTokenVerificaion.HandleTokenVerificationRequest(httpContext);
                 if (user != null) 
                 {
+                    var principal = new GenericPrincipal(
+                        new GenericIdentity(user.UserName, "JWT"),
+                        null
+                    );
+                    httpContext.User = principal;
                     return true;
                 }
                 return false;

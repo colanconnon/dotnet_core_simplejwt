@@ -12,7 +12,7 @@ namespace Sample.Controllers
         [Authorization("test")]
         public IActionResult Index()
         {
-            return Ok("hello");
+            return Ok(this.HttpContext.User.Identity.Name);
         }
 
         public IActionResult About()

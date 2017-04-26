@@ -67,7 +67,7 @@ namespace dotnet_core_simple_jwt
                 }
                 if (jwt.jwtData.Exp < DateTime.UtcNow) 
                 {
-                    throw new Exception("JWT Token is expired");
+                    throw new InvalidJwtException("JWT Token is expired");
                 }
                 return new IdentityUser() {
                     UserName = jwt.jwtData.Username,
@@ -75,9 +75,13 @@ namespace dotnet_core_simple_jwt
                     Email = jwt.jwtData.Username
                 };
             }
+            catch(InvalidJwtException e) 
+            {
+                throw new InvalidJwtException(e.Message);   
+            }
             catch(Exception e)
             {
-                return null;
+                throw new InvalidJwtException("Error verifying jwt token");   
             }
 
         }

@@ -112,14 +112,12 @@ namespace tests
                 Email = email
             };
             var mock = new Mock<HttpContext>();
-            var jwtVerify= new JwtTokenVerificaion<IdentityUser>(jwtOptions.secret, jwtOptions);
+            var jwtVerify= new JwtTokenVerificaion(jwtOptions.secret, jwtOptions);
             mock.Setup(item => item.Request.Headers.ContainsKey("Authorization"))
                 .Returns(true);
             mock.Setup(item => item.Request.Headers["Authorization"])
                 .Returns(jwtToken);
-            var _user = jwtVerify.HandleTokenVerificationRequest(mock.Object);
-            Assert.Equal(_user.Id, Id);
-            Assert.Equal(_user.UserName, username);
+            Assert.Throws<InvalidJwtException>(() => {jwtVerify.HandleTokenVerificationRequest(mock.Object);});
         }
     }
 }
